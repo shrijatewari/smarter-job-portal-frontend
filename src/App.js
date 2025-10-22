@@ -10,6 +10,11 @@ import Login from "./components/Login";
 import Signup from "./components/Signup";
 import ProfileEditor from "./components/ProfileEditor";
 import Internships from "./pages/Internships";
+import SkillTests from "./pages/SkillTests";
+import SkillTestsDebug from "./pages/SkillTestsDebug";
+import SkillTestsMinimal from "./pages/SkillTestsMinimal";
+import TakeTest from "./pages/TakeTest";
+import TestResults from "./pages/TestResults";
 import OAuthCallback from "./components/OAuthCallback";
 
 // Components
@@ -30,13 +35,15 @@ function AppContent() {
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api
-        .get("/api/auth/profile")
+        .get("http://localhost:4000/api/auth/profile")
         .then((res) => {
           setUser(res.data);
+          localStorage.setItem("userId", res.data.id);
         })
         .catch(() => {
           delete api.defaults.headers.common["Authorization"];
           localStorage.removeItem("token");
+          localStorage.removeItem("userId");
           setUser(null);
         });
     }
@@ -48,16 +55,21 @@ function AppContent() {
 
     if (userFromServer) {
       setUser(userFromServer);
+      localStorage.setItem("userId", userFromServer.id);
     } else {
       api
-        .get("/api/auth/profile")
-        .then((res) => setUser(res.data))
+        .get("http://localhost:4000/api/auth/profile")
+        .then((res) => {
+          setUser(res.data);
+          localStorage.setItem("userId", res.data.id);
+        })
         .catch(() => setUser(null));
     }
   };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
   };
@@ -81,6 +93,11 @@ function AppContent() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/internships" element={<Internships />} />
+                <Route path="/skill-tests" element={<SkillTests />} />
+                <Route path="/skill-tests-debug" element={<SkillTestsDebug />} />
+                <Route path="/skill-tests-minimal" element={<SkillTestsMinimal />} />
+                <Route path="/skill-tests/take" element={<TakeTest />} />
+                <Route path="/skill-tests/results" element={<TestResults />} />
                 <Route
                   path="/login"
                   element={

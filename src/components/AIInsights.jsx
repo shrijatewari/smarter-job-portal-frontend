@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { aiService } from '../utils/api';
+import axios from "axios";
 
 const AIInsights = ({ jobDescription }) => {
   const [keywords, setKeywords] = useState([]);
@@ -20,8 +20,8 @@ const AIInsights = ({ jobDescription }) => {
 
   const checkMLServiceHealth = async () => {
     try {
-      const health = await aiService.checkMLHealth();
-      setMlHealth(health);
+      const health = await axios.get("http://localhost:4000/api/ai/health");
+      setMlHealth(health.data);
     } catch (error) {
       console.warn('ML service health check failed:', error);
       setMlHealth({ status: 'unhealthy' });
@@ -40,8 +40,10 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced job summarization
-      const result = await aiService.summarizeJob(jobDescription);
-      setSummary(result.summary || 'No summary generated');
+      const result = await axios.post("http://localhost:4000/api/ai/summarize", {
+        jobDescription
+      });
+      setSummary(result.data.summary || 'No summary generated');
       
       // Extract keywords from job description for skills display
       const words = jobDescription.split(/\W+/)
@@ -74,13 +76,12 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced cover letter generation
-      const result = await aiService.generateCoverLetter(
-        resumeText,
-        jobDescription,
-        resumeFile
-      );
+      const result = await axios.post("http://localhost:4000/api/ai/cover-letter", {
+        resumeText: resumeText || 'Resume content',
+        jobDescription
+      });
       
-      setCoverLetter(result.cover_letter || 'No cover letter generated');
+      setCoverLetter(result.data.cover_letter || 'No cover letter generated');
       
     } catch (error) {
       console.error('Cover letter generation error:', error);
@@ -107,8 +108,11 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced fit score prediction
-      const result = await aiService.predictFitScore(resumeText || 'Resume content', jobDescription);
-      setFitScore(result.fit_score || 0);
+      const result = await axios.post("http://localhost:4000/api/ai/fit-score", {
+        resumeText: resumeText || 'Resume content',
+        jobDescription
+      });
+      setFitScore(result.data.fit_score || 0);
       
     } catch (error) {
       console.error('Fit score calculation error:', error);
@@ -130,8 +134,10 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced resume skill extraction
-      const result = await aiService.extractSkills(resumeText || 'Resume content');
-      setSkills(result.skills || []);
+      const result = await axios.post("http://localhost:4000/api/ai/extract-skills", {
+        resumeText: resumeText || 'Resume content'
+      });
+      setSkills(result.data.skills || []);
       
     } catch (error) {
       console.error('Skill extraction error:', error);

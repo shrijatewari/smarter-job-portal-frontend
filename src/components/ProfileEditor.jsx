@@ -1,6 +1,6 @@
 // src/components/ProfileEditor.jsx
 import React, { useState, useEffect } from "react";
-import api from "../utils/api";
+import axios from "axios";
 import { FaPlus, FaTrash, FaSave, FaUser, FaGraduationCap, FaBriefcase, FaCode, FaUpload, FaCamera, FaFilePdf } from "react-icons/fa";
 
 const ProfileEditor = ({ onProfileUpdate }) => {
@@ -34,7 +34,11 @@ const ProfileEditor = ({ onProfileUpdate }) => {
     const fetchProfile = async () => {
       try {
         console.log("Fetching profile for ProfileEditor...");
-        const res = await api.get("/api/user/profile");
+        const res = await axios.get("http://localhost:4000/api/auth/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         console.log("Profile loaded:", res.data);
         setProfile({
           name: res.data.name || "",
@@ -114,7 +118,11 @@ const ProfileEditor = ({ onProfileUpdate }) => {
       };
       
       // Use the user profile endpoint for updates
-      const res = await api.put("/api/user/profile", profileData);
+      const res = await axios.put("http://localhost:4000/api/auth/profile", profileData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       console.log("Profile saved successfully:", res.data);
       
       setMessage("Profile saved successfully! Your dashboard recommendations will be refreshed.");

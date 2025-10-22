@@ -40,6 +40,15 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
             Internships
           </Link>
         </li>
+        <li>
+          <Link
+            to="/skill-tests"
+            className="hover:underline"
+            style={{ color: "var(--muted)" }}
+          >
+            Skill Tests
+          </Link>
+        </li>
 
         {isLoggedIn ? (
           <>
@@ -89,6 +98,7 @@ const Navbar = ({ isLoggedIn, handleLogout }) => {
       <div className="flex md:hidden items-center gap-4 overflow-x-auto">
         <Link to="/" style={{ color: "var(--muted)" }}>Home</Link>
         <Link to="/internships" style={{ color: "var(--muted)" }}>Internships</Link>
+        <Link to="/skill-tests" style={{ color: "var(--muted)" }}>Skill Tests</Link>
         {isLoggedIn ? (
           <>
             <Link to="/dashboard" style={{ color: "var(--muted)" }}>Dashboard</Link>

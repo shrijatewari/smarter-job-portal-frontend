@@ -10,7 +10,7 @@ import {
   FaArrowLeft,
   FaArrowRight
 } from 'react-icons/fa';
-import api from '../utils/api';
+import axios from 'axios';
 import toast from 'react-hot-toast';
 
 // Custom Swipeable Card Component
@@ -213,7 +213,11 @@ const InternshipRoulette = () => {
       setLoading(true);
       setError(null);
       
-      const response = await api.get('/api/internships/random');
+      const response = await axios.get('http://localhost:4000/api/internships/random', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       setInternships(response.data.internships || []);
       
       console.log('🎲 Loaded internships for roulette:', response.data.internships?.length);
@@ -258,7 +262,7 @@ const InternshipRoulette = () => {
       }));
 
       // Save preference to backend
-      await api.post('/api/preferences/save', {
+      await axios.post('http://localhost:4000/api/preferences/save', {
         internshipId: internship._id,
         direction
       });

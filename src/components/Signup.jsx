@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import api from "../utils/api";
+import axios from "axios";
 import { BACKEND_URL } from "../config";
 
 function Signup({ onSignup }) {
@@ -35,7 +35,7 @@ function Signup({ onSignup }) {
     
     try {
       console.log("Submitting signup", { email });
-      const res = await api.post("/api/auth/signup", { name, email, password }, {
+      const res = await axios.post("http://localhost:4000/api/auth/signup", { name, email, password }, {
         timeout: 10000
       });
       const { token, user } = res.data;
@@ -72,7 +72,7 @@ function Signup({ onSignup }) {
             type="button"
             onClick={() => {
               setError(""); // Clear any existing errors
-              window.location.href = `${BACKEND_URL}/api/auth/google`;
+              window.location.href = "http://localhost:4000/api/auth/google";
             }}
             className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
             disabled={loading}
@@ -94,7 +94,7 @@ function Signup({ onSignup }) {
             type="button"
             onClick={() => {
               setError(""); // Clear any existing errors
-              window.location.href = `${BACKEND_URL}/api/auth/github`;
+              window.location.href = "http://localhost:4000/api/auth/github";
             }}
             className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
             disabled={loading}

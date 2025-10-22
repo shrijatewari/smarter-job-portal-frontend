@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import {
-  LineChart,
-  Line,
   AreaChart,
   Area,
   XAxis,
@@ -11,11 +9,7 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  BarChart,
-  Bar,
-  RadialBarChart,
-  RadialBar
+  Cell
 } from 'recharts';
 import { 
   FaArrowUp, 
@@ -32,7 +26,7 @@ import {
   FaInfoCircle,
   FaExclamationTriangle
 } from 'react-icons/fa';
-import api from '../utils/api';
+import axios from 'axios';
 
 const Analytics = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -55,7 +49,11 @@ const Analytics = () => {
         setLoading(true);
         setError(null);
         
-        const response = await api.get('/api/analytics/dashboard');
+        const response = await axios.get('http://localhost:4000/api/analytics/dashboard', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`
+          }
+        });
         setAnalyticsData(response.data);
         
       } catch (err) {
@@ -111,7 +109,6 @@ const Analytics = () => {
     fetchAnalyticsData();
   }, []);
 
-  const COLORS = ['#FFD3FF', '#A6C1EE', '#4A4A4A', '#7A7A7A'];
 
   if (loading) {
     return (

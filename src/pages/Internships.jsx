@@ -7,7 +7,6 @@ import {
   FaHeart,
   FaRegHeart,
   FaExternalLinkAlt,
-  FaSlidersH,
   FaBookmark,
 } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
@@ -75,32 +74,29 @@ export default function Internships() {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get("/api/internships/aggregate", {
+        const res = await axios.get("http://localhost:4000/api/internships", {
           params: {
-            keyword: qTitle || "internship",
-            location: qLocation || "",
-            limit: 25,
-            pages: 4,
+            limit: 50,
           },
-          timeout: 18000,
+          timeout: 10000,
         });
         // The JSearch API returns an object; some routes put items under res.data.data
         const list = Array.isArray(res.data) ? res.data : (res.data?.data || []);
-        // normalize fields used by UI
+        // normalize fields used by UI - updated for local database
         const normalized = list.map((it) => ({
-          job_id: it.job_id || it.job_id || Math.random().toString(36).slice(2, 9),
-          title: it.job_title || it.title || "Untitled Internship",
-          company: it.employer_name || it.company || "Company",
-          location: it.job_location || `${it.job_city || ""}${it.job_state ? `, ${it.job_state}` : ""}` || it.location || "Remote",
-          description: it.job_description || it.description || "",
-          apply_link: it.job_apply_link || it.apply_link || it.url || "#",
-          type: (it.job_employment_type || it.job_employment_types || ["Internship"])[0] || "Internship",
-          is_remote: !!it.job_is_remote || (it.job_employment_type === "Internship" && false),
-          duration_months: it.duration_months || null, // optional
-          stipend: it.salary || it.pay || null,
-          posted_at: it.job_posted_at_datetime_utc || it.posted_at || it.datePosted || null,
-          industry: (it.tags && it.tags[0]) || it.industry || "",
-          ai_fit: it.ai_fit || null, // optional custom field
+          job_id: it._id || it.externalId || Math.random().toString(36).slice(2, 9),
+          title: it.title || "Untitled Internship",
+          company: it.company || "Company",
+          location: it.location || "Remote",
+          description: it.description || "",
+          apply_link: it.url || "#",
+          type: "Internship",
+          is_remote: it.location?.toLowerCase().includes("remote") || false,
+          duration_months: null, // optional
+          stipend: null,
+          posted_at: it.datePosted || it.createdAt || null,
+          industry: it.source || "",
+          ai_fit: null, // optional custom field
         }));
         if (!cancelled) setRaw(normalized);
       } catch (err) {

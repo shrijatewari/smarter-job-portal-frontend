@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import api from "../utils/api";
-import { FaUserCircle, FaBell, FaHeart, FaRegHeart, FaExternalLinkAlt, FaBookmark } from "react-icons/fa";
+import axios from "axios";
+import { FaUserCircle, FaBell, FaHeart, FaRegHeart, FaExternalLinkAlt } from "react-icons/fa";
 import AIInsights from "../components/AIInsights"; // ✅ Import AIInsights
 import SavedInternships from "../components/SavedInternships"; // ✅ Import SavedInternships
+import TestHistory from "../components/TestHistory"; // ✅ Import TestHistory
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -24,7 +25,11 @@ function Dashboard() {
         }
 
         console.log("Fetching profile with token:", token ? "Token present" : "No token");
-        const res = await api.get("/api/auth/profile");
+        const res = await axios.get("http://localhost:4000/api/auth/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         console.log("Profile fetch successful:", res.data);
         setUser(res.data);
       } catch (err) {
@@ -66,7 +71,11 @@ function Dashboard() {
 
         // Fetch personalized recommendations
         try {
-          const res = await api.get("/api/recommendations/recommended");
+          const res = await axios.get("http://localhost:4000/api/internships/recommended", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+          });
           setRecommendedInternships(res.data || []);
           if (res.data && res.data.length > 0) {
             setMessage(""); // Clear any error messages
@@ -113,11 +122,19 @@ function Dashboard() {
           const fetchUpdatedData = async () => {
             try {
               // Refetch user profile
-              const userRes = await api.get("/api/auth/profile");
+              const userRes = await axios.get("http://localhost:4000/api/auth/profile", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+              });
               setUser(userRes.data);
               
               // Refetch recommendations with updated profile
-              const recRes = await api.get("/api/recommendations/recommended");
+              const recRes = await axios.get("http://localhost:4000/api/internships/recommended", {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+              });
               setRecommendedInternships(recRes.data || []);
               
               setMessage('Dashboard refreshed with updated recommendations!');
@@ -144,7 +161,7 @@ function Dashboard() {
   // Helper functions for Save/Apply actions
   const handleSaveInternship = async (internship) => {
     try {
-      await api.post("/api/profile/me/save", {
+      await axios.post("http://localhost:4000/api/profile/me/save", {
         internshipId: internship._id || internship.id,
         title: internship.title,
         company: internship.company,
@@ -152,7 +169,11 @@ function Dashboard() {
       });
       setMessage("Internship saved!");
       // Refresh saved internships
-      const res = await api.get("/api/profile/me");
+      const res = await axios.get("http://localhost:4000/api/profile/me", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       setSavedInternships(res.data.savedInternships || []);
     } catch (err) {
       console.error("Failed to save internship:", err);
@@ -162,14 +183,18 @@ function Dashboard() {
 
   const handleApplyInternship = async (internship) => {
     try {
-      await api.post("/api/profile/me/apply", {
+      await axios.post("http://localhost:4000/api/profile/me/apply", {
         internshipId: internship._id || internship.id,
         title: internship.title,
         company: internship.company
       });
       setMessage("Application recorded!");
       // Refresh applications
-      const res = await api.get("/api/profile/me");
+      const res = await axios.get("http://localhost:4000/api/profile/me", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
       setApplicationData(res.data.appliedInternships.map(app => ({
         id: app.internshipId,
         title: app.title,
@@ -303,6 +328,11 @@ function Dashboard() {
           </div>
         )}
 
+        {/* Test History */}
+        <section>
+          <TestHistory userId={user._id} />
+        </section>
+
         {/* Saved Internships */}
         <section>
           <SavedInternships 
@@ -310,7 +340,11 @@ function Dashboard() {
             onRemove={async (internshipId) => {
               try {
                 // Call backend to remove the internship
-                await api.delete(`/api/users/${user._id}/saved-internships/${internshipId}`);
+                await axios.delete(`http://localhost:4000/api/users/${user._id}/saved-internships/${internshipId}`, {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                  }
+                });
                 
                 // Remove from local state
                 setSavedInternships(prev => prev.filter(saved => {
