@@ -552,7 +552,7 @@ const AIAssistant = ({ jobDescription, userProfile, onClose }) => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-800">AI Career Assistant</h2>
-              <p className="text-gray-600">Your intelligent job search companion</p>
+              <p className="text-gray-600">Your intelligent job search companion - v2.0</p>
             </div>
           </div>
           <button
