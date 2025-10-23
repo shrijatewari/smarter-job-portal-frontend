@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import api from "./utils/api";
+import { BACKEND_URL } from "./config";
 
 // Pages
 import Home from "./pages/Home";
@@ -35,7 +36,7 @@ function AppContent() {
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       api
-        .get("http://localhost:4000/api/auth/profile")
+        .get(`${BACKEND_URL}/api/auth/profile`)
         .then((res) => {
           setUser(res.data);
           localStorage.setItem("userId", res.data.id);
@@ -58,7 +59,7 @@ function AppContent() {
       localStorage.setItem("userId", userFromServer.id);
     } else {
       api
-        .get("http://localhost:4000/api/auth/profile")
+        .get(`${BACKEND_URL}/api/auth/profile`)
         .then((res) => {
           setUser(res.data);
           localStorage.setItem("userId", res.data.id);

@@ -94,7 +94,7 @@ function Signup({ onSignup }) {
             type="button"
             onClick={() => {
               setError(""); // Clear any existing errors
-              window.location.href = "http://localhost:4000/api/auth/github";
+              window.location.href = `${BACKEND_URL}/api/auth/github`;
             }}
             className="w-full flex items-center justify-center gap-3 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition disabled:opacity-50"
             disabled={loading}
