@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 const AIInsights = ({ jobDescription }) => {
   const [keywords, setKeywords] = useState([]);
@@ -20,7 +21,7 @@ const AIInsights = ({ jobDescription }) => {
 
   const checkMLServiceHealth = async () => {
     try {
-      const health = await axios.get("http://localhost:4000/api/ai/health");
+      const health = await axios.get(`${BACKEND_URL}/api/ai/health`);
       setMlHealth(health.data);
     } catch (error) {
       console.warn('ML service health check failed:', error);
@@ -40,7 +41,7 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced job summarization
-      const result = await axios.post("http://localhost:4000/api/ai/summarize", {
+      const result = await axios.post(`${BACKEND_URL}/api/ai/summarize`, {
         jobDescription
       });
       setSummary(result.data.summary || 'No summary generated');
@@ -76,7 +77,7 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced cover letter generation
-      const result = await axios.post("http://localhost:4000/api/ai/cover-letter", {
+      const result = await axios.post(`${BACKEND_URL}/api/ai/cover-letter`, {
         resumeText: resumeText || 'Resume content',
         jobDescription
       });
@@ -108,7 +109,7 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced fit score prediction
-      const result = await axios.post("http://localhost:4000/api/ai/fit-score", {
+      const result = await axios.post(`${BACKEND_URL}/api/ai/fit-score`, {
         resumeText: resumeText || 'Resume content',
         jobDescription
       });
@@ -134,7 +135,7 @@ const AIInsights = ({ jobDescription }) => {
       setError(null);
       
       // Use enhanced resume skill extraction
-      const result = await axios.post("http://localhost:4000/api/ai/extract-skills", {
+      const result = await axios.post(`${BACKEND_URL}/api/ai/extract-skills`, {
         resumeText: resumeText || 'Resume content'
       });
       setSkills(result.data.skills || []);

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaPlus, FaTrash, FaSave, FaUser, FaGraduationCap, FaBriefcase, FaCode, FaUpload, FaCamera, FaFilePdf } from "react-icons/fa";
+import { BACKEND_URL } from "../config";
 
 const ProfileEditor = ({ onProfileUpdate }) => {
   const [profile, setProfile] = useState({
@@ -34,7 +35,7 @@ const ProfileEditor = ({ onProfileUpdate }) => {
     const fetchProfile = async () => {
       try {
         console.log("Fetching profile for ProfileEditor...");
-        const res = await axios.get("http://localhost:4000/api/auth/profile", {
+        const res = await axios.get(`${BACKEND_URL}/api/auth/profile`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }
@@ -118,7 +119,7 @@ const ProfileEditor = ({ onProfileUpdate }) => {
       };
       
       // Use the user profile endpoint for updates
-      const res = await axios.put("http://localhost:4000/api/auth/profile", profileData, {
+      const res = await axios.put(`${BACKEND_URL}/api/auth/profile`, profileData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
