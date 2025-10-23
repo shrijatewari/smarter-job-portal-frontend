@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { BACKEND_URL } from '../config';
 
 const AIAssistant = ({ jobDescription, userProfile, onClose }) => {
@@ -26,13 +26,7 @@ const AIAssistant = ({ jobDescription, userProfile, onClose }) => {
     { id: 'analytics', name: 'Analytics', icon: '📈', color: 'from-amber-500 to-orange-600' }
   ];
 
-  useEffect(() => {
-    if (jobDescription && userProfile) {
-      loadAnalysis();
-    }
-  }, [jobDescription, userProfile]);
-
-  const loadAnalysis = async () => {
+  const loadAnalysis = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`${BACKEND_URL}/api/ai/analyze-job-match`, {
@@ -50,7 +44,14 @@ const AIAssistant = ({ jobDescription, userProfile, onClose }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [jobDescription, userProfile]);
+
+  useEffect(() => {
+    if (jobDescription && userProfile) {
+      loadAnalysis();
+    }
+  }, [jobDescription, userProfile, loadAnalysis]);
+
 
   const loadResumeOptimization = async () => {
     setLoading(true);
