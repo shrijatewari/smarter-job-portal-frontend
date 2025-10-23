@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
 import api from "../utils/api";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "../config";
 
 const TakeTest = () => {
-  const { theme } = useContext(ThemeContext);
+  // const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
   const { questions, testId, category, difficulty, totalQuestions } = location.state || {};
@@ -18,59 +18,7 @@ const TakeTest = () => {
 
   const currentQuestion = questions?.[currentQuestionIndex];
 
-  useEffect(() => {
-    if (!questions || questions.length === 0) {
-      toast.error("No questions found. Please try again.");
-      navigate("/skill-tests");
-      return;
-    }
-
-    setTestStartTime(Date.now());
-    setTimeLeft(currentQuestion?.timer || 60);
-  }, [currentQuestion, navigate, questions]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prev) => {
-        if (prev <= 1) {
-          handleNextQuestion();
-          return currentQuestion?.timer || 60;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [currentQuestionIndex]);
-
-  const handleAnswerSelect = (answer) => {
-    setAnswers(prev => ({
-      ...prev,
-      [currentQuestion._id]: {
-        questionId: currentQuestion._id,
-        userAnswer: answer,
-        timeSpent: (currentQuestion?.timer || 60) - timeLeft
-      }
-    }));
-  };
-
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setTimeLeft(questions[currentQuestionIndex + 1]?.timer || 60);
-    } else {
-      handleSubmitTest();
-    }
-  };
-
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(prev => prev - 1);
-      setTimeLeft(questions[currentQuestionIndex - 1]?.timer || 60);
-    }
-  };
-
-  const handleSubmitTest = async () => {
+  const handleSubmitTest = useCallback(async () => {
     setIsSubmitting(true);
     
     try {
@@ -84,7 +32,7 @@ const TakeTest = () => {
       const answersArray = Object.values(answers);
       const totalTimeSpent = Math.floor((Date.now() - testStartTime) / 1000);
 
-      const response = await api.post("http://localhost:4000/api/tests/submit", {
+      const response = await api.post(`${BACKEND_URL}/api/tests/submit`, {
         userId,
         testId,
         category: category.id,
@@ -109,6 +57,58 @@ const TakeTest = () => {
       toast.error("Failed to submit test. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  }, [navigate, testId, category, difficulty, answers, testStartTime]);
+
+  const handleNextQuestion = useCallback(() => {
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+      setTimeLeft(questions[currentQuestionIndex + 1]?.timer || 60);
+    } else {
+      handleSubmitTest();
+    }
+  }, [currentQuestionIndex, questions, handleSubmitTest]);
+
+  useEffect(() => {
+    if (!questions || questions.length === 0) {
+      toast.error("No questions found. Please try again.");
+      navigate("/skill-tests");
+      return;
+    }
+
+    setTestStartTime(Date.now());
+    setTimeLeft(currentQuestion?.timer || 60);
+  }, [currentQuestion, navigate, questions]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          handleNextQuestion();
+          return currentQuestion?.timer || 60;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [currentQuestionIndex, currentQuestion?.timer, handleNextQuestion]);
+
+  const handleAnswerSelect = (answer) => {
+    setAnswers(prev => ({
+      ...prev,
+      [currentQuestion._id]: {
+        questionId: currentQuestion._id,
+        userAnswer: answer,
+        timeSpent: (currentQuestion?.timer || 60) - timeLeft
+      }
+    }));
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+      setTimeLeft(questions[currentQuestionIndex - 1]?.timer || 60);
     }
   };
 

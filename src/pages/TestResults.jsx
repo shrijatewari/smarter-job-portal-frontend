@@ -1,9 +1,8 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
 
 const TestResults = () => {
-  const { theme } = useContext(ThemeContext);
+  // const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
   const { testResult, category, difficulty } = location.state || {};

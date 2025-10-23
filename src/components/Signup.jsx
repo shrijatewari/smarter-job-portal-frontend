@@ -35,7 +35,7 @@ function Signup({ onSignup }) {
     
     try {
       console.log("Submitting signup", { email });
-      const res = await axios.post("http://localhost:4000/api/auth/signup", { name, email, password }, {
+      const res = await axios.post(`${BACKEND_URL}/api/auth/signup`, { name, email, password }, {
         timeout: 10000
       });
       const { token, user } = res.data;

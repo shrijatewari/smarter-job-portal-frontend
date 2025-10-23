@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
-import toast from "react-hot-toast";
+import { BACKEND_URL } from "../config";
+// import toast from "react-hot-toast";
 
 const TestHistory = ({ userId }) => {
   const [testHistory, setTestHistory] = useState([]);
@@ -9,16 +10,9 @@ const TestHistory = ({ userId }) => {
   const [stats, setStats] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (userId) {
-      fetchTestHistory();
-      fetchTestStats();
-    }
-  }, [userId]);
-
-  const fetchTestHistory = async () => {
+  const fetchTestHistory = useCallback(async () => {
     try {
-      const response = await api.get(`http://localhost:4000/api/tests/history/${userId}`, {
+      const response = await api.get(`${BACKEND_URL}/api/tests/history/${userId}`, {
         params: { limit: 5 }
       });
       
@@ -30,11 +24,11 @@ const TestHistory = ({ userId }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
-  const fetchTestStats = async () => {
+  const fetchTestStats = useCallback(async () => {
     try {
-      const response = await api.get(`http://localhost:4000/api/tests/stats/${userId}`);
+      const response = await api.get(`${BACKEND_URL}/api/tests/stats/${userId}`);
       
       if (response.data.success) {
         setStats(response.data.data);
@@ -42,7 +36,14 @@ const TestHistory = ({ userId }) => {
     } catch (error) {
       console.error("Error fetching test stats:", error);
     }
-  };
+  }, [userId]);
+
+  useEffect(() => {
+    if (userId) {
+      fetchTestHistory();
+      fetchTestStats();
+    }
+  }, [userId, fetchTestHistory, fetchTestStats]);
 
   const getScoreColor = (score) => {
     if (score >= 80) return "text-green-600";
@@ -50,11 +51,11 @@ const TestHistory = ({ userId }) => {
     return "text-red-600";
   };
 
-  const getScoreBgColor = (score) => {
-    if (score >= 80) return "bg-green-100";
-    if (score >= 60) return "bg-yellow-100";
-    return "bg-red-100";
-  };
+  // const getScoreBgColor = (score) => {
+  //   if (score >= 80) return "bg-green-100";
+  //   if (score >= 60) return "bg-yellow-100";
+  //   return "bg-red-100";
+  // };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {

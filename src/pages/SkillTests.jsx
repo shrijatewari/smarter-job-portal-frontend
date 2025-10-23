@@ -1,11 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeContext";
 import api from "../utils/api";
 import toast from "react-hot-toast";
+import { BACKEND_URL } from "../config";
 
 const SkillTests = () => {
-  const { theme } = useContext(ThemeContext);
+  // const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(null);
@@ -78,7 +78,7 @@ const SkillTests = () => {
 
     try {
       console.log("Fetching questions for:", selectedCategory.id, difficulty.id);
-      const response = await api.get(`http://localhost:4000/api/tests/questions`, {
+      const response = await api.get(`${BACKEND_URL}/api/tests/questions`, {
         params: {
           category: selectedCategory.id,
           difficulty: difficulty.id,

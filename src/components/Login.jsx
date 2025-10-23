@@ -34,7 +34,7 @@ function Login({ onLogin }) {
     
     try {
       console.log("Submitting login", { email });
-      const res = await axios.post("http://localhost:4000/api/auth/login", {
+      const res = await axios.post(`${BACKEND_URL}/api/auth/login`, {
         email,
         password,
       }, {
