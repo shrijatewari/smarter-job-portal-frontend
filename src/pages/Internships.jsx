@@ -9,8 +9,10 @@ import {
   FaRegHeart,
   FaExternalLinkAlt,
   FaBookmark,
+  FaRobot,
 } from "react-icons/fa";
 import { HiOutlineRefresh } from "react-icons/hi";
+import AIAssistant from "../components/AIAssistant";
 
 /*
   Browse Internships page
@@ -57,6 +59,11 @@ export default function Internships() {
   const PER_PAGE = 9;
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
+  // AI Assistant states
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+
   // saved items by job_id in localStorage
   const [saved, setSaved] = useState(() => {
     try {
@@ -66,6 +73,24 @@ export default function Internships() {
       return [];
     }
   });
+
+  // Load user profile for AI Assistant
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const response = await axios.get(`${BACKEND_URL}/api/auth/profile`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUserProfile(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to load user profile:', error);
+      }
+    };
+    loadUserProfile();
+  }, []);
 
   // fetch data when page loads or user hits Search
   const [queryNonce, setQueryNonce] = useState(0);
@@ -168,6 +193,11 @@ export default function Internships() {
 
   const toggleSave = (jobId) => {
     setSaved((s) => (s.includes(jobId) ? s.filter((x) => x !== jobId) : [jobId, ...s]));
+  };
+
+  const handleAIAssistant = (job) => {
+    setSelectedJob(job);
+    setShowAIAssistant(true);
   };
 
   // Filtering pipeline
@@ -315,8 +345,11 @@ export default function Internships() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button className="hidden md:inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full bg-white/90 shadow-sm">
-                <FaSearch /> AI Assistant
+              <button 
+                onClick={() => setShowAIAssistant(true)}
+                className="hidden md:inline-flex items-center gap-2 text-sm px-3 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-sm hover:shadow-md transition-all"
+              >
+                <FaRobot /> AI Assistant
               </button>
               <div className="w-9 h-9 rounded-full bg-white/90 shadow flex items-center justify-center">S</div>
             </div>
@@ -492,6 +525,14 @@ export default function Internships() {
                           <span className="text-sm">{saved.includes(job.job_id) ? "Saved" : "Save"}</span>
                         </button>
 
+                        <button
+                          onClick={() => handleAIAssistant(job)}
+                          className="flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow text-sm hover:shadow-md transition-all"
+                        >
+                          <FaRobot className="text-xs" />
+                          <span className="text-sm">AI Analysis</span>
+                        </button>
+
                         <a
                           href={job.apply_link}
                           target="_blank"
@@ -572,6 +613,15 @@ export default function Internships() {
           </div>
         </footer>
       </div>
+
+      {/* AI Assistant Modal */}
+      {showAIAssistant && (
+        <AIAssistant
+          jobDescription={selectedJob ? `${selectedJob.title} at ${selectedJob.company}\n\n${selectedJob.description}` : ''}
+          userProfile={userProfile}
+          onClose={() => setShowAIAssistant(false)}
+        />
+      )}
     </div>
   );
 }
