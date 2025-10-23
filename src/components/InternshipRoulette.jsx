@@ -266,6 +266,10 @@ const InternshipRoulette = () => {
       await axios.post(`${BACKEND_URL}/api/preferences/save`, {
         internshipId: internship._id,
         direction
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        }
       });
 
       // Show toast notification

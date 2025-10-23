@@ -1,6 +1,7 @@
 // src/pages/Internships.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { BACKEND_URL } from "../config";
 import {
   FaSearch,
   FaMapMarkerAlt,
@@ -74,7 +75,7 @@ export default function Internships() {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get("http://localhost:4000/api/internships", {
+        const res = await axios.get(`${BACKEND_URL}/api/internships`, {
           params: {
             limit: 50,
           },
