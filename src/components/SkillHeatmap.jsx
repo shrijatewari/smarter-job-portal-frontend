@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaFire, FaChartBar, FaFilter, FaTimes, FaInfoCircle, FaSync } from "react-icons/fa";
 import axios from "axios";
+import { BACKEND_URL } from "../config";
 
 // Custom Heatmap Cell Component
 const HeatmapCell = ({ value, skill, category, maxValue, onClick, onHover, onLeave }) => {
@@ -135,7 +136,7 @@ const SkillHeatmap = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get("http://localhost:4000/api/skills/heatmap", {
+      const response = await axios.get(`${BACKEND_URL}/api/skills/heatmap`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }

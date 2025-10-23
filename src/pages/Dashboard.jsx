@@ -5,6 +5,7 @@ import { FaUserCircle, FaBell, FaHeart, FaRegHeart, FaExternalLinkAlt } from "re
 import AIInsights from "../components/AIInsights"; // ✅ Import AIInsights
 import SavedInternships from "../components/SavedInternships"; // ✅ Import SavedInternships
 import TestHistory from "../components/TestHistory"; // ✅ Import TestHistory
+import { BACKEND_URL } from "../config";
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -25,7 +26,7 @@ function Dashboard() {
         }
 
         console.log("Fetching profile with token:", token ? "Token present" : "No token");
-        const res = await axios.get("http://localhost:4000/api/auth/profile", {
+        const res = await axios.get(`${BACKEND_URL}/api/auth/profile`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -71,7 +72,7 @@ function Dashboard() {
 
         // Fetch personalized recommendations
         try {
-          const res = await axios.get("http://localhost:4000/api/internships/recommended", {
+          const res = await axios.get(`${BACKEND_URL}/api/internships/recommended`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`
             }
@@ -122,7 +123,7 @@ function Dashboard() {
           const fetchUpdatedData = async () => {
             try {
               // Refetch user profile
-              const userRes = await axios.get("http://localhost:4000/api/auth/profile", {
+              const userRes = await axios.get(`${BACKEND_URL}/api/auth/profile`, {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -130,7 +131,7 @@ function Dashboard() {
               setUser(userRes.data);
               
               // Refetch recommendations with updated profile
-              const recRes = await axios.get("http://localhost:4000/api/internships/recommended", {
+              const recRes = await axios.get(`${BACKEND_URL}/api/internships/recommended`, {
                 headers: {
                   Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
@@ -161,7 +162,7 @@ function Dashboard() {
   // Helper functions for Save/Apply actions
   const handleSaveInternship = async (internship) => {
     try {
-      await axios.post("http://localhost:4000/api/profile/me/save", {
+      await axios.post(`${BACKEND_URL}/api/profile/me/save`, {
         internshipId: internship._id || internship.id,
         title: internship.title,
         company: internship.company,
@@ -169,7 +170,7 @@ function Dashboard() {
       });
       setMessage("Internship saved!");
       // Refresh saved internships
-      const res = await axios.get("http://localhost:4000/api/profile/me", {
+      const res = await axios.get(`${BACKEND_URL}/api/profile/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -183,14 +184,14 @@ function Dashboard() {
 
   const handleApplyInternship = async (internship) => {
     try {
-      await axios.post("http://localhost:4000/api/profile/me/apply", {
+      await axios.post(`${BACKEND_URL}/api/profile/me/apply`, {
         internshipId: internship._id || internship.id,
         title: internship.title,
         company: internship.company
       });
       setMessage("Application recorded!");
       // Refresh applications
-      const res = await axios.get("http://localhost:4000/api/profile/me", {
+      const res = await axios.get(`${BACKEND_URL}/api/profile/me`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -340,7 +341,7 @@ function Dashboard() {
             onRemove={async (internshipId) => {
               try {
                 // Call backend to remove the internship
-                await axios.delete(`http://localhost:4000/api/users/${user._id}/saved-internships/${internshipId}`, {
+                await axios.delete(`${BACKEND_URL}/api/users/${user._id}/saved-internships/${internshipId}`, {
                   headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                   }

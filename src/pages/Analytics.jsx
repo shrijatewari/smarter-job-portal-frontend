@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { BACKEND_URL } from '../config';
 import {
   AreaChart,
   Area,
@@ -49,7 +50,7 @@ const Analytics = () => {
         setLoading(true);
         setError(null);
         
-        const response = await axios.get('http://localhost:4000/api/analytics/dashboard', {
+        const response = await axios.get(`${BACKEND_URL}/api/analytics/dashboard`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`
           }

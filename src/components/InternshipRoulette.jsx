@@ -11,6 +11,7 @@ import {
   FaArrowRight
 } from 'react-icons/fa';
 import axios from 'axios';
+import { BACKEND_URL } from '../config';
 import toast from 'react-hot-toast';
 
 // Custom Swipeable Card Component
@@ -213,7 +214,7 @@ const InternshipRoulette = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get('http://localhost:4000/api/internships/random', {
+      const response = await axios.get(`${BACKEND_URL}/api/internships/random`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -262,7 +263,7 @@ const InternshipRoulette = () => {
       }));
 
       // Save preference to backend
-      await axios.post('http://localhost:4000/api/preferences/save', {
+      await axios.post(`${BACKEND_URL}/api/preferences/save`, {
         internshipId: internship._id,
         direction
       });
